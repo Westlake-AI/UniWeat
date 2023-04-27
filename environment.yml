@@ -1,0 +1,19 @@
+name: UniWeat
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - nni
+  - numpy
+  - hickle
+  - opencv-python
+  - pip
+  - python
+  - pytorch
+  - xarray
+  - pip:
+    - fvcore
+    - timm
+    - tqdm
+prefix: /opt/anaconda3/envs/uniweat
