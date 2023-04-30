@@ -74,12 +74,16 @@ class CrevNet(Base_method):
                     loss, self.model_optim,
                     clip_grad=self.args.clip_grad, clip_mode=self.args.clip_mode,
                     parameters=self.model.parameters())
+                self.loss_scaler(
+                    loss, self.model_optim2,
+                    clip_grad=self.args.clip_grad, clip_mode=self.args.clip_mode,
+                    parameters=self.model.parameters())
             else:
                 loss.backward()
                 self.clip_grads(self.model.parameters())
+                self.model_optim.step()
+                self.model_optim2.step()
 
-            self.model_optim.step()
-            self.model_optim2.step()
             torch.cuda.synchronize()
             num_updates += 1
 

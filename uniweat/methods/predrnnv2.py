@@ -72,8 +72,8 @@ class PredRNNv2(PredRNN):
             else:
                 loss.backward()
                 self.clip_grads(self.model.parameters())
+                self.model_optim.step()
 
-            self.model_optim.step()
             torch.cuda.synchronize()
             num_updates += 1
 
