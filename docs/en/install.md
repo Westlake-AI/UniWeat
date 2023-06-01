@@ -39,7 +39,10 @@ python setup.py develop  # or `pip install -e .`
 
 **Note:**
 
-1. Some errors might occur with `hickle` and `xarray` when using KittiCaltech and WeatherBench datasets. As for KittiCaltech, you can solve the issues by installing additional pacakges according to the output messeage. As for WeatherBench, you can install the latest version of `xarray` to solve the errors, i.e., `pip install xarray==0.19.0` and then installing required pacakges according to error messages.
+1. Installation errors. 
+    * If you are installing `cv2` for the first time, `ImportError: libGL.so.1` will occur, which can be solved by `apt install libgl1-mesa-glx`.
+    * Errors might occur with `hickle` and this dependency when using KittiCaltech dataset. You can solve the issues by installing additional packages according to the output message.
+    * As for WeatherBench, you encounter some import or runtime errors in the version of `xarray`. You can install the latest version or `xarray==0.19.0` to solve the errors, i.e., `pip install xarray==0.19.0`, and then install required packages according to error messages.
 
 2. Following the above instructions, OpenSTL is installed on `dev` mode, any local modifications made to the code will take effect. You can install it by `pip install .` to use it as a PyPi package, and you should reinstall it to make the local modifications effect.
 
@@ -56,18 +59,27 @@ UniWeat
 ├── configs
 └── data
     ├── caltech
+    │   ├── set06
+    │   ├── ...
+    │   ├── set10
+    │   ├── data_cache.npy
+    │   ├── indices_cache.npy
     ├── human
     |   ├── images
     |   ├── test.txt
     |   ├── train.txt
     |── kitti_hkl
     |   ├── sources_test_mini.hkl
-    |   ├── X_train.hkl
     |   ├── ...
+    |   ├── X_train.hkl
+    │   ├── X_val.hkl
     |── kth
     |   ├── boxing
     |   ├── ...
+    |   ├── walking
     |── moving_fmnist
+    |   ├── fmnist_test_seq.npy
+    |   ├── train-images-idx3-ubyte.gz
     |── moving_mnist
     |   ├── mnist_test_seq.npy
     |   ├── train-images-idx3-ubyte.gz
@@ -80,3 +92,27 @@ UniWeat
     |   ├── 2m_temperature
     |   ├── ...
 ```
+
+### Moving MNIST / FMNIST
+
+[Moving MNIST](http://arxiv.org/abs/1502.04681) and [Moving FMNIST](http://arxiv.org/abs/1502.04681) are toy datasets, which generate gray-scale videos (64x64 resolutions) with two objects. We provide [download_mmnist.sh](https://github.com/chengtan9907/OpenSTL/tree/master/tools/prepare_data/download_mmnist.sh) and [download_mfmnist.sh](https://github.com/chengtan9907/OpenSTL/tree/master/tools/prepare_data/download_mfmnist.sh), which download datasets from [MMNIST download](http://www.cs.toronto.edu/~nitish/unsupervised_video/) and [MFMNIST download](http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/train-images-idx3-ubyte.gz). Note that the train set is generated online while the test set is fixed to ensure the consistency of evaluation results.
+
+### KittiCaltech Pedestrian
+
+The KittiCaltech Pedestrian dataset uses [Kitti Pedestrian](https://dl.acm.org/doi/10.1177/0278364913491297) as the train set (2042 videos) and uses [Caltech Pedestrian](https://data.caltech.edu/records/f6rph-90m20) as the test set (1983 videos). We provide [download_kitticaltech.sh](https://github.com/chengtan9907/OpenSTL/tree/master/tools/prepare_data/download_kitticaltech.sh) to prepare the datasets. The data preprocessing of RGB videos (128x160 resolutions) and experiment settings are adopted from [PredNet](https://github.com/coxlab/prednet).
+
+### KTH Action
+
+The [KTH Action](https://ieeexplore.ieee.org/document/1334462) dataset contains grey-scale videos (128x128 resolutions) of six types of human actions performed several times by 25 subjects in four different scenarios. It has 5200 and 3167 videos for the train and test sets and can be downloaded from [KTH download](https://www.csc.kth.se/cvap/actions/). We provide [download_kth.sh](https://github.com/chengtan9907/OpenSTL/tree/master/tools/prepare_data/download_kth.sh) to prepare the dataset. The data preprocessing and experiment settings are adopted from [KTH](https://ieeexplore.ieee.org/document/1334462) and [PredRNN](https://github.com/thuml/predrnn-pytorch).
+
+### Human 3.6M
+
+The [Human3.6M](http://vision.imar.ro/human3.6m/pami-h36m.pdf) dataset contains high-resolution videos (1024x1024 resolutions) of seventeen scenarios of human actions performed by eleven professional actors, which can be downloaded from [Human3.6M download](http://vision.imar.ro/human3.6m/description.php). We provide [download_human3.6m.sh](https://github.com/chengtan9907/OpenSTL/tree/master/tools/prepare_data/download_human3.6m.sh) to prepare the dataset. We borrow the train and test splitting files from [STRPM](https://github.com/ZhengChang467/STRPM) but use 256x256 resolutions in our experiments.
+
+### WeatherBench
+
+[WeatherBench](https://arxiv.org/abs/2002.00469) is the publicly available dataset for global weather prediction, which can be downloaded and processed from [WeatherBench download](https://github.com/pangeo-data/WeatherBench). We choose some important weather variants with certain vertical levels and resolutions, e.g., 2m_temperature, relative_humidity, and total_cloud_cover. You can download the specific dataset of WeatherBench with [download_weatherbench.sh](https://github.com/chengtan9907/OpenSTL/tree/master/tools/prepare_data/download_weatherbench.sh). Note that `5.625deg` and `1.40625deg` indicate 32x64 and 128x256 resolutions, and the data can have multiple channels.
+
+### TaxiBJ
+
+[TaxiBJ](https://arxiv.org/abs/1610.00081) is a popular traffic trajectory prediction dataset, which contains the trajectory data (32x32) in Beijing collected from taxicab GPS with two channels, which can be downloaded from [OneDrive](https://1drv.ms/f/s!Akh6N7xv3uVmhOhDKwx3bm5zpHkDOQ) or [Baidu Cloud](http://pan.baidu.com/s/1qYq7ja8). We borrow the data preprocessing scripts from [DeepST](https://github.com/TolicWang/DeepST/tree/master/data/TaxiBJ) and provide the processed data in our [Baidu Cloud](https://pan.baidu.com/s/1fudsBHyrf3nbt-7d42YWWg?pwd=kjfk).

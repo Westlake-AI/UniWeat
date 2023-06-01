@@ -19,27 +19,21 @@ def load_data(dataname, batch_size, val_batch_size, num_workers, data_root, dist
     elif 'kth' in dataname:  # 'kth', 'kth20', 'kth40'
         from .dataloader_kth import load_data
         return load_data(batch_size, val_batch_size, data_root, num_workers, **cfg_dataloader)
-    elif dataname == 'mmnist':
+    elif 'mnist' in dataname:  # 'mmnist', 'mfmnist'
         from .dataloader_moving_mnist import load_data
+        cfg_dataloader['data_name'] = kwargs.get('data_name', 'mnist')
         return load_data(batch_size, val_batch_size, data_root, num_workers, **cfg_dataloader)
     elif dataname == 'taxibj':
         from .dataloader_taxibj import load_data
         return load_data(batch_size, val_batch_size, data_root, num_workers, **cfg_dataloader)
-    elif 'weather' in dataname:
+    elif 'weather' in dataname:  # 'weather', 'weather_t2m', etc.
+        from .dataloader_weather_bench import load_data
         data_split_pool = ['5_625', '2_8125', '1_40625']
         data_split = '5_625'
         for k in data_split_pool:
             if dataname.find(k) != -1:
                 data_split = k
-        # multi-variable weather-bench
-        if 'mv' in dataname:
-            from .dataloader_weather_bench_mv import load_data
-            return load_data(batch_size, val_batch_size, data_root, num_workers,
-                            distributed=dist, data_split=data_split, **kwargs)
-        # single-variable weather-bench
-        else:
-            from .dataloader_weather_bench import load_data
-            return load_data(batch_size, val_batch_size, data_root, num_workers,
-                            distributed=dist, data_split=data_split, **kwargs)
+        return load_data(batch_size, val_batch_size, data_root, num_workers,
+                         distributed=dist, data_split=data_split, **kwargs)
     else:
         raise ValueError(f'Dataname {dataname} is unsupported')

@@ -239,7 +239,7 @@ class BaseExperiment(object):
     def display_method_info(self):
         """Plot the basic infomation of supported methods"""
         T, C, H, W = self.args.in_shape
-        if self.args.method == 'simvp':
+        if self.args.method in ['simvp', 'tau']:
             input_dummy = torch.ones(1, self.args.pre_seq_length, C, H, W).to(self.device)
         elif self.args.method == 'crevnet':
             # crevnet must use the batchsize rather than 1
@@ -261,6 +261,10 @@ class BaseExperiment(object):
             _tmp_input = torch.ones(1, self.args.total_length, Hp, Wp, Cp).to(self.device)
             _tmp_flag = torch.ones(1, self.args.total_length - 2, Hp, Wp, Cp).to(self.device)
             input_dummy = (_tmp_input, _tmp_flag)
+        elif self.args.method == 'dmvfn':
+            input_dummy = torch.ones(1, 3, C, H, W, requires_grad=True).to(self.device)
+        elif self.args.method == 'prednet':
+           input_dummy = torch.ones(1, 10, C, H, W, requires_grad=True).to(self.device)
         else:
             raise ValueError(f'Invalid method name {self.args.method}')
 
@@ -283,6 +287,9 @@ class BaseExperiment(object):
 
         eta = 1.0  # PredRNN variants
         for epoch in range(self._epoch, self._max_epochs):
+            if self._dist and hasattr(self.train_loader.sampler, 'set_epoch'):
+                self.train_loader.sampler.set_epoch(epoch)
+
             num_updates, loss_mean, eta = self.method.train_one_epoch(self, self.train_loader,
                                                                       epoch, num_updates, eta)
 
@@ -291,7 +298,7 @@ class BaseExperiment(object):
                 cur_lr = self.method.current_lr()
                 cur_lr = sum(cur_lr) / len(cur_lr)
                 with torch.no_grad():
-                    vali_loss = self.vali(self.vali_loader)
+                    vali_loss = self.vali()
 
                 if self._rank == 0:
                     print_log('Epoch: {0}, Steps: {1} | Lr: {2:.7f} | Train Loss: {3:.7f} | Vali Loss: {4:.7f}\n'.format(
@@ -308,25 +315,18 @@ class BaseExperiment(object):
         time.sleep(1)  # wait for some hooks like loggers to finish
         self.call_hook('after_run')
 
-    def vali(self, vali_loader):
+    def vali(self):
         """A validation loop during training"""
         self.call_hook('before_val_epoch')
-        preds, trues, val_loss = self.method.vali_one_epoch(self, self.vali_loader)
+        results, eval_log = self.method.vali_one_epoch(self, self.vali_loader)
         self.call_hook('after_val_epoch')
 
         if self._rank == 0:
-            if 'weather' in self.args.dataname:
-                metric_list, spatial_norm = ['mse', 'rmse', 'mae'], True
-            else:
-                metric_list, spatial_norm = ['mse', 'mae'], False
-            eval_res, eval_log = metric(preds, trues, vali_loader.dataset.mean, vali_loader.dataset.std,
-                                        metrics=metric_list, spatial_norm=spatial_norm)
-
             print_log('val\t '+eval_log)
             if has_nni:
-                nni.report_intermediate_result(eval_res['mse'])
+                nni.report_intermediate_result(results['mse'].mean())
 
-        return val_loss
+        return results['loss'].mean()
 
     def test(self):
         """A testing loop of STL methods"""
@@ -335,16 +335,19 @@ class BaseExperiment(object):
             self._load_from_state_dict(torch.load(best_model_path))
 
         self.call_hook('before_val_epoch')
-        inputs, trues, preds = self.method.test_one_epoch(self, self.test_loader)
+        results = self.method.test_one_epoch(self, self.test_loader)
         self.call_hook('after_val_epoch')
 
         if 'weather' in self.args.dataname:
             metric_list, spatial_norm = ['mse', 'rmse', 'mae'], True
+            channel_names = self.test_loader.dataset.data_name if 'mv' in self.args.dataname else None
         else:
             metric_list, spatial_norm = ['mse', 'mae', 'ssim', 'psnr'], False
-        eval_res, eval_log = metric(preds, trues, self.test_loader.dataset.mean, self.test_loader.dataset.std,
-                                    metrics=metric_list, spatial_norm=spatial_norm)
-        metrics = np.array([eval_res['mae'], eval_res['mse']])
+            channel_names = None
+        eval_res, eval_log = metric(results['preds'], results['trues'],
+                                    self.test_loader.dataset.mean, self.test_loader.dataset.std,
+                                    metrics=metric_list, channel_names=channel_names, spatial_norm=spatial_norm)
+        results['metrics'] = np.array([eval_res['mae'], eval_res['mse']])
 
         if self._rank == 0:
             print_log(eval_log)
@@ -352,6 +355,6 @@ class BaseExperiment(object):
             check_dir(folder_path)
 
             for np_data in ['metrics', 'inputs', 'trues', 'preds']:
-                np.save(osp.join(folder_path, np_data + '.npy'), vars()[np_data])
+                np.save(osp.join(folder_path, np_data + '.npy'), results[np_data])
 
         return eval_res['mse']
