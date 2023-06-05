@@ -1,6 +1,6 @@
 # Getting Started
 
-This page provides basic tutorials about the usage of OpenSTL with various weather prediction tasks. For installation instructions, please see [Install](docs/en/install.md).
+This page provides basic tutorials about the usage of UniWeat with various weather prediction tasks. For installation instructions, please see [Install](docs/en/install.md).
 
 ## Training and Testing with a Single GPU
 
@@ -62,19 +62,26 @@ bash tools/dist_train.sh ${CONFIG_FILE} ${GPUS} [optional arguments]
 - `${CONFIG_FILE}` : The path of a model config file, which will provide detailed settings for a STL method.
 - `${GPUS}` : The number of GPUs for DDP training.
 
-Examples of multiple GPUs training on Moving MNIST dataset with a machine with 8 GPUs.
+Examples of multiple GPUs training on Moving MNIST dataset with a machine with 8 GPUs. Note that some recurrent-based STL methods (e.g., ConvLSTM, PredRNN++) need `--find_unused_parameters` during DDP training.
 ```shell
-PORT=29001 CUDA_VISIBLE_DEVICES=0,1 bash tools/dist_train.sh configs/mmnist/simvp/SimVP_gSTA.py 2 -d mmnist --lr 1e-3 --batch_size 8
-PORT=29002 CUDA_VISIBLE_DEVICES=2,3 bash tools/dist_train.sh configs/mmnist/PredRNN.py 2 -d mmnist --lr 1e-3 --batch_size 8
-PORT=29003 CUDA_VISIBLE_DEVICES=4,5,6,7 bash tools/dist_train.sh configs/mmnist/PredRNNpp.py 4 -d mmnist --lr 1e-3 --batch_size 4
+PORT=29001 CUDA_VISIBLE_DEVICES=0,1 bash tools/dist_train.sh configs/video/mmnist/simvp/SimVP_gSTA.py 2 -d mmnist --lr 1e-3 --batch_size 8
+PORT=29002 CUDA_VISIBLE_DEVICES=2,3 bash tools/dist_train.sh configs/video/mmnist/PredRNN.py 2 -d mmnist --lr 1e-3 --batch_size 8
+PORT=29003 CUDA_VISIBLE_DEVICES=4,5,6,7 bash tools/dist_train.sh configs/video/mmnist/PredRNNpp.py 4 -d mmnist --lr 1e-3 --batch_size 4
 ```
 
-An example of multiple GPUs testing on Moving MNIST dataset. The bash script is `bash tools/dist_train.sh ${CONFIG_FILE} ${GPUS} ${CHECKPOINT} [optional arguments]`.
+Examples of multiple GPUs training on Multi-variant WeatherBench dataset (`mv_weather_4_4_s6_d1_40625`) with a machine with 8 GPUs.
 ```shell
-PORT=29001 CUDA_VISIBLE_DEVICES=0,1 bash tools/dist_test.sh configs/mmnist/simvp/SimVP_gSTA.py 2 work_dirs/mmnist/simvp/SimVP_gSTA -d mmnist
+PORT=29001 bash tools/dist_train.sh configs/weather/weather_bench_mv/mv_4_s6_1_40625/SimVP_Swin.py 4 -d mv_weather_4_4_s6_d1_40625 --lr 1e-3 --batch_size 2 --num_workers 2 --sched cosine
 ```
 
-**Note**: During DDP training, the number of GPUS `ngpus` should be provided and checkpoints and logs are saved in the same folder structure as the config file under `work_dirs/` (it will be the default setting if `--ex_name` is not specified). The default learning rate `lr` and the batch size `bs` in config files are for a single GPU. If using a different number GPUs, the total batch size will change in proportion, you have to scale the learning rate following `lr = base_lr * ngpus` and `bs = base_bs * ngpus`. Other arguments should be added as the single GPU training.
+An example of multiple GPUs testing on Moving MNIST dataset. The bash script is `bash tools/dist_train.sh ${CONFIG_FILE} ${GPUS} ${CHECKPOINT} [optional arguments]`, where the first three augments are necessary.
+```shell
+PORT=29001 CUDA_VISIBLE_DEVICES=0,1 bash tools/dist_test.sh configs/mmnist/simvp/SimVP_gSTA.py 2 work_dirs/mmnist/simvp/SimVP_gSTA -d mmnist --val_batch_size 32
+```
+
+**Note**:
+* During DDP training, the number of GPUS `ngpus` should be provided, and checkpoints and logs are saved in the same folder structure as the config file under `work_dirs/` (it will be the default setting if `--ex_name` is not specified). The default learning rate `lr` and the batch size `bs` in config files are for a single GPU. If using a different number GPUs, the total batch size will change in proportion, you have to scale the learning rate following `lr = base_lr * ngpus` and `bs = base_bs * ngpus` (known as the `linear scaling rule`). Other arguments should be added as the single GPU training.
+* Experiment results using different GPUs settings will produce different results. We have noticed that single GPU training with DP and DDP setups will produce similar results, while different multiple GPUs using linear scaling rules will cause different results because of DDP training. For example, SimVP+gSTA is trained 200 epochs on MMNIST with `1GPU (DP)`, `1GPU (DDP)`, `2GPUs (2xbs8)`, and `4GPUs (4xbs4)` using the same learning rate (lr=1e-3), we produce results of MSE 26.73, 26.78, 30.01, 31.36. Therefore, we will provide the used GPUs setting in the benchmark result with the corresponding learning rate for fair comparison and reproducible purposes.
 
 ## Mixed Precision Training
 

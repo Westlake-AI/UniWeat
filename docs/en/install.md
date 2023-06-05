@@ -85,33 +85,47 @@ UniWeat
     |   ├── train-images-idx3-ubyte.gz
     |── taxibj
     |   ├── dataset.npz
-    |── weather
+    |── mv_weather_1_40625deg
+    |   ├── q
+    |   |   ├── test
+    |   |   ├── train
+    |   |   ├── val
+    |   |   ├── mean.pkl
+    |   |   ├── std.pkl
+    |   ├── t
+    |   ├── ...
+    |   ├── z
+    |── weather  # single-variant
     |   ├── 2m_temperature
     |   ├── ...
-    |── weather_1_40625deg
+    |── weather_1_40625deg  # single-variant
     |   ├── 2m_temperature
     |   ├── ...
 ```
 
 ### Moving MNIST / FMNIST
 
-[Moving MNIST](http://arxiv.org/abs/1502.04681) and [Moving FMNIST](http://arxiv.org/abs/1502.04681) are toy datasets, which generate gray-scale videos (64x64 resolutions) with two objects. We provide [download_mmnist.sh](https://github.com/chengtan9907/OpenSTL/tree/master/tools/prepare_data/download_mmnist.sh) and [download_mfmnist.sh](https://github.com/chengtan9907/OpenSTL/tree/master/tools/prepare_data/download_mfmnist.sh), which download datasets from [MMNIST download](http://www.cs.toronto.edu/~nitish/unsupervised_video/) and [MFMNIST download](http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/train-images-idx3-ubyte.gz). Note that the train set is generated online while the test set is fixed to ensure the consistency of evaluation results.
+[Moving MNIST](http://arxiv.org/abs/1502.04681) and [Moving FMNIST](http://arxiv.org/abs/1502.04681) are toy datasets, which generate gray-scale videos (64x64 resolutions) with two objects. We provide [download_mmnist.sh](https://github.com/Westlake-AI/UniWeat/tree/main/tools/prepare_data/download_mmnist.sh) and [download_mfmnist.sh](https://github.com/Westlake-AI/UniWeat/tree/main/tools/prepare_data/download_mfmnist.sh), which download datasets from [MMNIST download](http://www.cs.toronto.edu/~nitish/unsupervised_video/) and [MFMNIST download](http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/train-images-idx3-ubyte.gz). Note that the train set is generated online while the test set is fixed to ensure the consistency of evaluation results.
 
 ### KittiCaltech Pedestrian
 
-The KittiCaltech Pedestrian dataset uses [Kitti Pedestrian](https://dl.acm.org/doi/10.1177/0278364913491297) as the train set (2042 videos) and uses [Caltech Pedestrian](https://data.caltech.edu/records/f6rph-90m20) as the test set (1983 videos). We provide [download_kitticaltech.sh](https://github.com/chengtan9907/OpenSTL/tree/master/tools/prepare_data/download_kitticaltech.sh) to prepare the datasets. The data preprocessing of RGB videos (128x160 resolutions) and experiment settings are adopted from [PredNet](https://github.com/coxlab/prednet).
+The KittiCaltech Pedestrian dataset uses [Kitti Pedestrian](https://dl.acm.org/doi/10.1177/0278364913491297) as the train set (2042 videos) and uses [Caltech Pedestrian](https://data.caltech.edu/records/f6rph-90m20) as the test set (1983 videos). We provide [download_kitticaltech.sh](https://github.com/Westlake-AI/UniWeat/tree/main/tools/prepare_data/download_kitticaltech.sh) to prepare the datasets. The data preprocessing of RGB videos (128x160 resolutions) and experiment settings are adopted from [PredNet](https://github.com/coxlab/prednet).
 
 ### KTH Action
 
-The [KTH Action](https://ieeexplore.ieee.org/document/1334462) dataset contains grey-scale videos (128x128 resolutions) of six types of human actions performed several times by 25 subjects in four different scenarios. It has 5200 and 3167 videos for the train and test sets and can be downloaded from [KTH download](https://www.csc.kth.se/cvap/actions/). We provide [download_kth.sh](https://github.com/chengtan9907/OpenSTL/tree/master/tools/prepare_data/download_kth.sh) to prepare the dataset. The data preprocessing and experiment settings are adopted from [KTH](https://ieeexplore.ieee.org/document/1334462) and [PredRNN](https://github.com/thuml/predrnn-pytorch).
+The [KTH Action](https://ieeexplore.ieee.org/document/1334462) dataset contains grey-scale videos (128x128 resolutions) of six types of human actions performed several times by 25 subjects in four different scenarios. It has 5200 and 3167 videos for the train and test sets and can be downloaded from [KTH download](https://www.csc.kth.se/cvap/actions/). We provide [download_kth.sh](https://github.com/Westlake-AI/UniWeat/tree/main/tools/prepare_data/download_kth.sh) to prepare the dataset. The data preprocessing and experiment settings are adopted from [KTH](https://ieeexplore.ieee.org/document/1334462) and [PredRNN](https://github.com/thuml/predrnn-pytorch).
 
 ### Human 3.6M
 
-The [Human3.6M](http://vision.imar.ro/human3.6m/pami-h36m.pdf) dataset contains high-resolution videos (1024x1024 resolutions) of seventeen scenarios of human actions performed by eleven professional actors, which can be downloaded from [Human3.6M download](http://vision.imar.ro/human3.6m/description.php). We provide [download_human3.6m.sh](https://github.com/chengtan9907/OpenSTL/tree/master/tools/prepare_data/download_human3.6m.sh) to prepare the dataset. We borrow the train and test splitting files from [STRPM](https://github.com/ZhengChang467/STRPM) but use 256x256 resolutions in our experiments.
+The [Human3.6M](http://vision.imar.ro/human3.6m/pami-h36m.pdf) dataset contains high-resolution videos (1024x1024 resolutions) of seventeen scenarios of human actions performed by eleven professional actors, which can be downloaded from [Human3.6M download](http://vision.imar.ro/human3.6m/description.php). We provide [download_human3.6m.sh](https://github.com/Westlake-AI/UniWeat/tree/main/tools/prepare_data/download_human3.6m.sh) to prepare the dataset. We borrow the train and test splitting files from [STRPM](https://github.com/ZhengChang467/STRPM) but use 256x256 resolutions in our experiments.
+
+### Multi-variant WeatherBench
+
+[WeatherBench](https://arxiv.org/abs/2002.00469) is the publicly available dataset for global weather prediction, which can be downloaded and processed from [WeatherBench download](https://github.com/pangeo-data/WeatherBench). In the multi-variant version, we choose the important weather variants ('z', 'q', 't', 'u', 'v', 't2m', 'u10', and 'v10') with various vertical levels at high resolutions (128x256). You can download the specific dataset of WeatherBench with [download_weatherbench.sh](https://github.com/Westlake-AI/UniWeat/tree/main/tools/prepare_data/download_weatherbench.sh). Note that `5.625deg` and `1.40625deg` indicate 32x64 and 128x256 resolutions, and the data can have multiple channels. The dataloader is defined in [dataloader_weather_bench_mv](https://github.com/Westlake-AI/UniWeat/tree/main/uniweat/datasets/dataloader_weather_bench_mv.py).
 
 ### WeatherBench
 
-[WeatherBench](https://arxiv.org/abs/2002.00469) is the publicly available dataset for global weather prediction, which can be downloaded and processed from [WeatherBench download](https://github.com/pangeo-data/WeatherBench). We choose some important weather variants with certain vertical levels and resolutions, e.g., 2m_temperature, relative_humidity, and total_cloud_cover. You can download the specific dataset of WeatherBench with [download_weatherbench.sh](https://github.com/chengtan9907/OpenSTL/tree/master/tools/prepare_data/download_weatherbench.sh). Note that `5.625deg` and `1.40625deg` indicate 32x64 and 128x256 resolutions, and the data can have multiple channels.
+[WeatherBench](https://arxiv.org/abs/2002.00469) is the publicly available dataset for global weather prediction, which can be downloaded and processed from [WeatherBench download](https://github.com/pangeo-data/WeatherBench). We choose some important weather variants with certain vertical levels and resolutions, e.g., 2m_temperature, relative_humidity, and total_cloud_cover. You can download the specific dataset of WeatherBench with [download_weatherbench.sh](https://github.com/Westlake-AI/UniWeat/tree/main/tools/prepare_data/download_weatherbench.sh). Note that `5.625deg` and `1.40625deg` indicate 32x64 and 128x256 resolutions, and the data can have multiple channels. The single-variant dataloader is defined in [dataloader_weather_bench](https://github.com/Westlake-AI/UniWeat/tree/main/uniweat/datasets/dataloader_weather_bench.py).
 
 ### TaxiBJ
 

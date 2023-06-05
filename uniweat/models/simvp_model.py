@@ -18,11 +18,13 @@ class SimVP_Model(nn.Module):
                  mlp_ratio=8., drop=0.0, drop_path=0.0, spatio_kernel_enc=3,
                  spatio_kernel_dec=3, **kwargs):
         super(SimVP_Model, self).__init__()
-        T, C, H, W = in_shape  # T is pre_seq_length
+        T, self.C_in, H, W = in_shape  # T is pre_seq_length
         H, W = int(H / 2**(N_S/2)), int(W / 2**(N_S/2))  # downsample 1 / 2**(N_S/2)
+        out_shape = kwargs.get('out_shape', None)
+        self.C_out = out_shape[1] if out_shape is not None else self.C_in
 
-        self.enc = Encoder(C, hid_S, N_S, spatio_kernel_enc)
-        self.dec = Decoder(hid_S, C, N_S, spatio_kernel_dec)
+        self.enc = Encoder(self.C_in, hid_S,  N_S, spatio_kernel_enc)
+        self.dec = Decoder(hid_S, self.C_out, N_S, spatio_kernel_dec)
 
         model_type = 'gsta' if model_type is None else model_type.lower()
         if model_type == 'incepu':
@@ -44,7 +46,7 @@ class SimVP_Model(nn.Module):
         hid = hid.reshape(B*T, C_, H_, W_)
 
         Y = self.dec(hid, skip)
-        Y = Y.reshape(B, T, C, H, W)
+        Y = Y.reshape(B, T, -1, H, W)
 
         return Y
 

@@ -264,7 +264,7 @@ class BaseExperiment(object):
         elif self.args.method == 'dmvfn':
             input_dummy = torch.ones(1, 3, C, H, W, requires_grad=True).to(self.device)
         elif self.args.method == 'prednet':
-           input_dummy = torch.ones(1, 10, C, H, W, requires_grad=True).to(self.device)
+           input_dummy = torch.ones(1, 1, C, H, W, requires_grad=True).to(self.device)
         else:
             raise ValueError(f'Invalid method name {self.args.method}')
 
@@ -339,11 +339,10 @@ class BaseExperiment(object):
         self.call_hook('after_val_epoch')
 
         if 'weather' in self.args.dataname:
-            metric_list, spatial_norm = ['mse', 'rmse', 'mae'], True
+            metric_list, spatial_norm = self.args.metrics, True
             channel_names = self.test_loader.dataset.data_name if 'mv' in self.args.dataname else None
         else:
-            metric_list, spatial_norm = ['mse', 'mae', 'ssim', 'psnr'], False
-            channel_names = None
+            metric_list, spatial_norm, channel_names = self.args.metrics, False, None
         eval_res, eval_log = metric(results['preds'], results['trues'],
                                     self.test_loader.dataset.mean, self.test_loader.dataset.std,
                                     metrics=metric_list, channel_names=channel_names, spatial_norm=spatial_norm)

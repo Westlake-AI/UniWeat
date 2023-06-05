@@ -8,6 +8,7 @@ def load_data(dataname, batch_size, val_batch_size, num_workers, data_root, dist
         distributed=dist,
         use_augment=kwargs.get('use_augment', False),
         use_prefetcher=kwargs.get('use_prefetcher', False),
+        drop_last=kwargs.get('drop_last', False),
     )
 
     if dataname == 'human':
@@ -26,14 +27,17 @@ def load_data(dataname, batch_size, val_batch_size, num_workers, data_root, dist
     elif dataname == 'taxibj':
         from .dataloader_taxibj import load_data
         return load_data(batch_size, val_batch_size, data_root, num_workers, **cfg_dataloader)
-    elif 'weather' in dataname:  # 'weather', 'weather_t2m', etc.
-        from .dataloader_weather_bench import load_data
+    elif 'weather' in dataname:
         data_split_pool = ['5_625', '2_8125', '1_40625']
         data_split = '5_625'
         for k in data_split_pool:
             if dataname.find(k) != -1:
                 data_split = k
+        if 'mv_weather' in dataname:
+            from .dataloader_weather_bench_mv import load_data
+        else:  # 'weather_t2m', etc.
+            from .dataloader_weather_bench import load_data
         return load_data(batch_size, val_batch_size, data_root, num_workers,
-                         distributed=dist, data_split=data_split, **kwargs)
+                            distributed=dist, data_split=data_split, **kwargs)
     else:
         raise ValueError(f'Dataname {dataname} is unsupported')

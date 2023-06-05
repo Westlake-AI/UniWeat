@@ -14,6 +14,9 @@ dependencies:
   - xarray
   - pip:
     - fvcore
+    - lpips
+    - pickle
+    - scikit-image
     - timm
     - tqdm
 prefix: /opt/anaconda3/envs/uniweat
