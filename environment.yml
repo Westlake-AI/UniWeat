@@ -15,7 +15,7 @@ dependencies:
   - pip:
     - fvcore
     - lpips
-    - pickle
+    - pickleshare
     - scikit-image
     - timm
     - tqdm

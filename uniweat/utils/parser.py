@@ -60,6 +60,8 @@ def create_parser():
                         help='Whether to use prefetcher for faster data loading')
     parser.add_argument('--drop_last', action='store_true', default=False,
                         help='Whether to drop the last batch in the val data loading')
+    parser.add_argument('--eval_by_channel', action='store_true', default=False,
+                        help='Whether to eval each channels for the multi-variant data')
 
     # method parameters
     parser.add_argument('--method', '-m', default='SimVP', type=str,

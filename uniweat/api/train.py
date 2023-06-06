@@ -339,8 +339,9 @@ class BaseExperiment(object):
         self.call_hook('after_val_epoch')
 
         if 'weather' in self.args.dataname:
-            metric_list, spatial_norm = self.args.metrics, True
-            channel_names = self.test_loader.dataset.data_name if 'mv' in self.args.dataname else None
+            metric_list, spatial_norm, channel_names = self.args.metrics, True, None
+            if 'mv' in self.args.dataname and self.args.eval_by_channel:
+                channel_names = self.test_loader.dataset.data_name
         else:
             metric_list, spatial_norm, channel_names = self.args.metrics, False, None
         eval_res, eval_log = metric(results['preds'], results['trues'],

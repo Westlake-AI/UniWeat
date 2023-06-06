@@ -9,7 +9,7 @@ netcdf4
 numpy
 opencv-python
 packaging
-pickle
+pickleshare
 six
 scikit-learn
 timm>=0.5.4,<=0.6.11

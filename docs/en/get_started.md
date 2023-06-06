@@ -64,14 +64,14 @@ bash tools/dist_train.sh ${CONFIG_FILE} ${GPUS} [optional arguments]
 
 Examples of multiple GPUs training on Moving MNIST dataset with a machine with 8 GPUs. Note that some recurrent-based STL methods (e.g., ConvLSTM, PredRNN++) need `--find_unused_parameters` during DDP training.
 ```shell
-PORT=29001 CUDA_VISIBLE_DEVICES=0,1 bash tools/dist_train.sh configs/video/mmnist/simvp/SimVP_gSTA.py 2 -d mmnist --lr 1e-3 --batch_size 8
-PORT=29002 CUDA_VISIBLE_DEVICES=2,3 bash tools/dist_train.sh configs/video/mmnist/PredRNN.py 2 -d mmnist --lr 1e-3 --batch_size 8
-PORT=29003 CUDA_VISIBLE_DEVICES=4,5,6,7 bash tools/dist_train.sh configs/video/mmnist/PredRNNpp.py 4 -d mmnist --lr 1e-3 --batch_size 4
+PORT=29001 CUDA_VISIBLE_DEVICES=0,1 bash tools/dist_train.sh configs/video/mmnist/simvp/SimVP_gSTA.py 2 -d mmnist --lr 1e-3 --batch_size 8 --epoch 200
+PORT=29002 CUDA_VISIBLE_DEVICES=2,3 bash tools/dist_train.sh configs/video/mmnist/PredRNN.py 2 -d mmnist --lr 1e-3 --batch_size 8 --epoch 200
+PORT=29003 CUDA_VISIBLE_DEVICES=4,5,6,7 bash tools/dist_train.sh configs/video/mmnist/PredRNNpp.py 4 -d mmnist --lr 1e-3 --batch_size 4 --epoch 200
 ```
 
 Examples of multiple GPUs training on Multi-variant WeatherBench dataset (`mv_weather_4_4_s6_d1_40625`) with a machine with 8 GPUs.
 ```shell
-PORT=29001 bash tools/dist_train.sh configs/weather/weather_bench_mv/mv_4_s6_1_40625/SimVP_Swin.py 4 -d mv_weather_4_4_s6_d1_40625 --lr 1e-3 --batch_size 2 --num_workers 2 --sched cosine
+PORT=29001 bash tools/dist_train.sh configs/weather/weather_bench_mv/mv_4_s6_1_40625/SimVP_Swin.py 4 -d mv_weather_4_4_s6_d1_40625 --lr 1e-3 --batch_size 2 --epoch 100 --num_workers 2 --sched cosine
 ```
 
 An example of multiple GPUs testing on Moving MNIST dataset. The bash script is `bash tools/dist_train.sh ${CONFIG_FILE} ${GPUS} ${CHECKPOINT} [optional arguments]`, where the first three augments are necessary.
